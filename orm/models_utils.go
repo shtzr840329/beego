@@ -105,6 +105,20 @@ func getTableUnique(val reflect.Value) [][]string {
 	return nil
 }
 
+// get table composite primary key from method
+func getTableCPK(val reflect.Value) []string {
+	fun := val.MethodByName("TableCPK")
+	if fun.IsValid() {
+		vals := fun.Call([]reflect.Value{})
+		if len(vals) > 0 && vals[0].CanInterface() {
+			if d, ok := vals[0].Interface().([]string); ok {
+				return d
+			}
+		}
+	}
+	return nil
+}
+
 // get snaked column name
 func getColumnName(ft int, addrField reflect.Value, sf reflect.StructField, col string) string {
 	column := col
