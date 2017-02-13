@@ -168,7 +168,13 @@ func (o *orm) Insert(md interface{}) (int64, error) {
 		return id, err
 	}
 
-	o.setPk(mi, ind, id)
+	// If Composite PK, dont set single PK
+	if len(mi.fields.pks) > 0 {
+		// TODO Set Composite PK
+		id = 0
+	} else {
+		o.setPk(mi, ind, id)
+	}
 
 	return id, nil
 }
