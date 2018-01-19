@@ -60,44 +60,23 @@ func registerModel(PrefixOrSuffix string, model interface{}, isPrefix bool) {
 	}
 
 	mi := newModelInfo(val)
-	cpk := getTableCPK(val)
-	pks := make(map[string]*fieldInfo)
-
-	if mi.fields.pk != nil && cpk != nil {
-		fmt.Printf("<orm.RegisterModel> `%s` model cant have both a pk field and a composite pk\n", name)
-		os.Exit(2)
-	}
-
 	if mi.fields.pk == nil {
-		if cpk != nil {
-			for _, pf := range cpk {
-				if mi.fields.fields[pf] != nil {
-					pks[pf] = mi.fields.fields[pf]
+	outFor:
+		for _, fi := range mi.fields.fieldsDB {
+			if strings.ToLower(fi.name) == "id" {
+				switch fi.addrValue.Elem().Kind() {
+				case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
+					fi.auto = true
+					fi.pk = true
+					mi.fields.pk = fi
+					break outFor
 				}
-			}
-			if len(pks) > 0 {
-				mi.fields.pks = pks
 			}
 		}
 
-		if len(pks) == 0 {
-		outFor:
-			for _, fi := range mi.fields.fieldsDB {
-				if strings.ToLower(fi.name) == "id" {
-					switch fi.addrValue.Elem().Kind() {
-					case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
-						fi.auto = true
-						fi.pk = true
-						mi.fields.pk = fi
-						break outFor
-					}
-				}
-			}
-
-			if mi.fields.pk == nil {
-				fmt.Printf("<orm.RegisterModel> `%s` need a primary key field, default use 'id' if not set\n", name)
-				os.Exit(2)
-			}
+		if mi.fields.pk == nil {
+			fmt.Printf("<orm.RegisterModel> `%s` need a primary key field, default use 'id' if not set\n", name)
+			os.Exit(2)
 		}
 
 	}

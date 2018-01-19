@@ -26,7 +26,6 @@ var errSkipField = errors.New("skip field")
 // field info collection
 type fields struct {
 	pk            *fieldInfo
-	pks           map[string]*fieldInfo
 	columns       map[string]*fieldInfo
 	fields        map[string]*fieldInfo
 	fieldsLow     map[string]*fieldInfo

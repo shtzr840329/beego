@@ -200,16 +200,6 @@ func getDbCreateSQL(al *alias) (sqls []string, tableIndexes map[string][]dbIndex
 		}
 
 		if mi.model != nil {
-			// Generate composite primary key create SQL
-			if len(mi.fields.pks) > 0 {
-				cols := make([]string, 0, len(mi.fields.pks))
-				for _, fi := range mi.fields.pks {
-					cols = append(cols, fi.column)
-				}
-				column := fmt.Sprintf("    PRIMARY KEY (%s%s%s)", Q, strings.Join(cols, sep), Q)
-				columns = append(columns, column)
-			}
-
 			allnames := getTableUnique(mi.addrField)
 			if !mi.manual && len(mi.uniques) > 0 {
 				allnames = append(allnames, mi.uniques)
